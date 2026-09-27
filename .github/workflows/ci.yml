@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: ["22", "24"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm test
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: npm install --no-save typescript @types/node
+      - run: npm run typecheck
+
+  self-test:
+    # Run the tool against its own fixture, so a broken build cannot merge.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: schema is inferred
+        run: node src/cli.ts test/fixtures/sales.jsonl --schema | tee schema.txt
+      - name: a mixed column is flagged
+        run: grep -q MIXED schema.txt
+      - name: filtering and grouping work
+        run: |
+          test "$(node src/cli.ts test/fixtures/sales.jsonl -g country --count | wc -l)" -eq 3
+          test "$(node src/cli.ts test/fixtures/sales.jsonl -f 'country == "BR"' --count)" -eq 3

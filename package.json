@@ -1,0 +1,17 @@
+{
+  "name": "jsql",
+  "version": "0.1.0",
+  "description": "Query JSONL without loading it: schema inference, filtering, grouping and streaming aggregation.",
+  "type": "module",
+  "bin": { "jsql": "./src/cli.ts" },
+  "engines": { "node": ">=22.6" },
+  "scripts": {
+    "test": "node --test test/",
+    "typecheck": "tsc --noEmit",
+    "demo": "node src/cli.ts test/fixtures/sales.jsonl --schema"
+  },
+  "keywords": ["jsonl", "ndjson", "cli", "query", "schema", "streaming"],
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/maybecooldev/jsql.git" },
+  "author": "maybecooldev"
+}
