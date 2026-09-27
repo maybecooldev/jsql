@@ -3,7 +3,7 @@ import { test, describe } from 'node:test';
 
 import { emptySchema, isMixed, observe, typeOf } from '../src/schema.ts';
 import { Aggregator } from '../src/table.ts';
-import { renderNdjson, renderSchema, table } from '../src/format.ts';
+import { renderNdjson, renderSchema, renderTable, table } from '../src/format.ts';
 
 function agg(records: Array<Record<string, unknown>>, options = {}) {
   const aggregator = new Aggregator(options);
@@ -244,5 +244,33 @@ describe('formatting', () => {
   test('an empty result renders without throwing', () => {
     const result = agg([], { groupBy: 'country' });
     assert.equal(renderNdjson(result), '');
+  });
+
+  test('the table renders a grouped result', () => {
+    // This path had a Set.filter, which is not a function. The ungrouped
+    // tests all passed straight over it.
+    const out = renderTable(agg(SALES, { groupBy: 'country', operations: [{ kind: 'sum', field: 'amount' }] }));
+    const [header] = out.split('\n');
+    assert.match(header, /GROUP/);
+    assert.match(header, /amount_sum/);
+    assert.match(header, /count/);
+    assert.equal(out.split('\n').length, 5); // header, rule, three groups
+  });
+
+  test('the table renders an ungrouped result without a group column', () => {
+    const out = renderTable(agg(SALES, { select: 'country, amount' }));
+    const [header] = out.split('\n');
+    assert.doesNotMatch(header, /GROUP/);
+    assert.match(header, /country/);
+  });
+
+  test('the table shows the group key in its own column', () => {
+    const out = renderTable(agg(SALES, { groupBy: 'country' }));
+    const rows = out.split('\n').slice(2);
+    assert.equal(rows.length, 3);
+    for (const [index, row] of rows.entries()) {
+      assert.match(row, /^(BR|PT|US)/);
+      assert.equal(row.split(/\s+/)[0], ['BR', 'PT', 'US'][index]);
+    }
   });
 });

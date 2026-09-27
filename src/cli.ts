@@ -55,6 +55,8 @@ interface Args {
   schema: boolean;
   format: string;
   maxLine: string;
+  help: boolean;
+  version: boolean;
 }
 
 function parseCli(argv: string[]): Args {
@@ -92,7 +94,9 @@ function parseCli(argv: string[]): Args {
     limit: values.limit,
     schema: values.schema,
     format: values.format || (values.schema ? 'schema' : ''),
-    maxLine: values['max-line'],
+    maxLine: values['max-line'] ?? '1048576',
+    help: values.help,
+    version: values.version,
   } as Args;
 }
 

@@ -56,7 +56,7 @@ export function renderTable(result: Result): string {
   // it only earns a column when there is a real key to show.
   const keyed = result.grouped;
   const header = [...(keyed ? ['GROUP'] : []), ...columns];
-  const names = keyed ? columns.filter((name) => name !== 'GROUP') : [...columns];
+  const names = [...columns].filter((name) => name !== 'GROUP');
   const rows = result.groups.map((group) => [
     ...(keyed ? [group.key] : []),
     ...names.map((name) =>

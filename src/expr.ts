@@ -215,7 +215,8 @@ class Parser {
     return expr;
   }
 
-  private parseExpression(minPrecedence: number): Expr {
+  /** Public because parseSelect drives a Parser directly to split a projection list. */
+  parseExpression(minPrecedence: number): Expr {
     let left = this.parsePrefix();
 
     for (;;) {
