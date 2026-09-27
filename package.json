@@ -6,7 +6,7 @@
   "bin": { "jsql": "./src/cli.ts" },
   "engines": { "node": ">=22.6" },
   "scripts": {
-    "test": "node --test test/",
+    "test": "node --test",
     "typecheck": "tsc --noEmit",
     "demo": "node src/cli.ts test/fixtures/sales.jsonl --schema"
   },
